@@ -19,6 +19,12 @@ const todo = (a) => {
   console.info(`TODO: ${a}`)
 } 
 
+const logit =
+  (marker) =>
+  (message) => {
+  console.log(`${marker}: \n`, message)
+}
+
 // false || handle
 const handler = (action_type) => ([[sub_action_type, handle], ...rest]) => (source_action_type) => {
   // console.log([action_type, sub_action_type], source_action_type, deepEqual(action_type))
@@ -505,6 +511,7 @@ const editor_create_page =
     ('create_page'))
   .then(pe)
 }
+
 const editor_delete_page = (pe) => ({page_name}) => {
   logseq.deletePage(page_name)
   .then(() =>
@@ -540,8 +547,16 @@ const editor_get_all_pages =
 const editor_get_block =
   (pe) =>
   (space) =>
-  () => {
-  todo('editor_get_block')
+  (data) => {
+  // todo('editor_get_block')
+  logseq.Editor.getBlock(data, {includeChildren: true})
+  . then(
+    make_message
+    (space)
+    ('editor')
+    ('get_block')
+  )
+  . then(pe)
 }
 
 const editor_get_block_properties =
@@ -610,8 +625,17 @@ const editor_get_page =
 const editor_get_page_blocks_tree =
   (pe) =>
   (space) =>
-  () => {
-  todo('editor_get_page_blocks_tree')
+  (data) => {
+  logseq.Editor.getPageBlocksTree(data)
+  . then(logit('get_page_blocks'))
+  . then(
+      make_message
+      (space)
+      ('editor')
+      ('get_page_blocks_tree')
+    )
+  . then(pe)
+  // todo('editor_get_page_blocks_tree')
 }
 
 const editor_get_page_linked_references =
@@ -701,8 +725,17 @@ const editor_register_block_context_menu_item =
 const editor_register_slash_command =
   (pe) =>
   (space) =>
-  () => {
-  todo('editor_register_slash_command')
+  (data) => {
+  logseq.Editor.registerSlashCommand(data, ({uuid}) => {
+    pe(
+      make_message
+      (space)
+      ('editor')
+      ('register_slash_command')
+      (uuid)
+    )
+  })
+  // todo('editor_register_slash_command')
 }
 
 const editor_remove_block =
@@ -1013,19 +1046,19 @@ const make_logseq_driver = ({
   style,
   ui_item,
 }) => {
-  if (!!model) {  
-    logseq.provideModel(model)
-  } 
-  if (!!main_ui_inline_style) {    
-    logseq.setMainUIInlineStyle(main_ui_inline_style)
-  }
-  if (!!style) {    
-    logseq.provideStyle(style)
-  }
+  // if (!!model) {  
+  //   logseq.provideModel(model)
+  // } 
+  // if (!!main_ui_inline_style) {    
+  //   logseq.setMainUIInlineStyle(main_ui_inline_style)
+  // }
+  // if (!!style) {    
+  //   logseq.provideStyle(style)
+  // }
 
-  if (!!ui_item) {
-    logseq.App.registerUIItem('toolbar', ui_item)
-  }
+  // if (!!ui_item) {
+  //   logseq.App.registerUIItem('toolbar', ui_item)
+  // }
     
   let logseqqer = make_logseqqer()
 
